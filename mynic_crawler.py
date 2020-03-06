@@ -10,14 +10,15 @@ class MynicCrawler(crawler.Crawler):
         billing_contact = contactboxes[3]
         technical_contact = contactboxes[4]
         # name_server = contactboxes[5]
-        data={
-            'invoicing_party_dict': {},
-            'registrant_dict': {},
-            'administrative_contact_dict': {},
-            'billing_contact_dict': {},
-            'technical_contact_dict': {},
+        data = {
+            'invoicing_party': {},
+            'registrant': {},
+            'administrative_contact': {},
+            'billing_contact': {},
+            'technical_contact': {},
 
         }
+
         # name_server_dict = {}
 
         def fill_data(node, dict):
@@ -29,26 +30,27 @@ class MynicCrawler(crawler.Crawler):
                 'fax': node.find('span', {'class': 'cfax'}) and node.find('span', {'class': 'cfax'}).text.strip() or '',
             })
 
-        fill_data(invoicing_party, data['invoicing_party_dict'])
-        fill_data(registrant, data['registrant_dict'])
-        fill_data(administrative_contact, data['administrative_contact_dict'])
-        fill_data(billing_contact, data['billing_contact_dict'])
-        fill_data(technical_contact, data['technical_contact_dict'])
+        fill_data(invoicing_party, data['invoicing_party'])
+        fill_data(registrant, data['registrant'])
+        fill_data(administrative_contact, data['administrative_contact'])
+        fill_data(billing_contact, data['billing_contact'])
+        fill_data(technical_contact, data['technical_contact'])
         # fill_data(name_server, name_server_dict)
         return data
+
+
 tor_proxy = 'socks5://localhost:9050'
 
 from multiprocessing import Pool
 import os
+
 if __name__ == '__main__':
     def test(count):
-        print(count)
         c = MynicCrawler(proxies={'http': tor_proxy, 'https': tor_proxy})
         c.crawl('https://mynic.my/whois/', {'domain': 'test.my'})
         data = c.parse_data()
         print(data)
 
-    # with Pool(os.cpu_count()) as p:
-    #     p.map(test, range(10))
-    test(1)
 
+    with Pool(os.cpu_count()) as p:
+        p.map(test, range(500))
