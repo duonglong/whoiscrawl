@@ -9,14 +9,16 @@ class MynicCrawler(crawler.Crawler):
         administrative_contact = contactboxes[2]
         billing_contact = contactboxes[3]
         technical_contact = contactboxes[4]
-        name_server = contactboxes[5]
+        # name_server = contactboxes[5]
+        data={
+            'invoicing_party_dict': {},
+            'registrant_dict': {},
+            'administrative_contact_dict': {},
+            'billing_contact_dict': {},
+            'technical_contact_dict': {},
 
-        invoicing_party_dict = {}
-        registrant_dict = {}
-        administrative_contact_dict = {}
-        billing_contact_dict = {}
-        technical_contact_dict = {}
-        name_server_dict = {}
+        }
+        # name_server_dict = {}
 
         def fill_data(node, dict):
             dict.update({
@@ -27,15 +29,26 @@ class MynicCrawler(crawler.Crawler):
                 'fax': node.find('span', {'class': 'cfax'}) and node.find('span', {'class': 'cfax'}).text.strip() or '',
             })
 
-        fill_data(invoicing_party, invoicing_party_dict)
-        fill_data(registrant, registrant_dict)
-        fill_data(administrative_contact, administrative_contact_dict)
-        fill_data(billing_contact, billing_contact_dict)
-        fill_data(technical_contact, technical_contact_dict)
-        fill_data(name_server, name_server_dict)
+        fill_data(invoicing_party, data['invoicing_party_dict'])
+        fill_data(registrant, data['registrant_dict'])
+        fill_data(administrative_contact, data['administrative_contact_dict'])
+        fill_data(billing_contact, data['billing_contact_dict'])
+        fill_data(technical_contact, data['technical_contact_dict'])
+        # fill_data(name_server, name_server_dict)
+        return data
+tor_proxy = 'socks5://localhost:9050'
 
-
+from multiprocessing import Pool
+import os
 if __name__ == '__main__':
-    c = MynicCrawler()
-    c.crawl('https://mynic.my/whois/', {'domain': 'test.my'})
-    c.parse_data()
+    def test(count):
+        print(count)
+        c = MynicCrawler(proxies={'http': tor_proxy, 'https': tor_proxy})
+        c.crawl('https://mynic.my/whois/', {'domain': 'test.my'})
+        data = c.parse_data()
+        print(data)
+
+    # with Pool(os.cpu_count()) as p:
+    #     p.map(test, range(10))
+    test(1)
+

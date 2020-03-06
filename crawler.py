@@ -4,16 +4,12 @@ from bs4 import BeautifulSoup
 
 class Crawler(object):
     def __init__(self, proxies=None):
-        self.proxies = proxies or {}
         self.session = requests.Session()
+        self.session.proxies = proxies
         self.response = None
-        self.url = ''
-        self.data = {}
 
     def crawl(self, url, data):
-        self.url = url
-        self.data = data
-        self.response = self._post(url, data=data, proxies=self.proxies)
+        self.response = self._post(url, data=data)
 
     def _post(self, *args, **kwargs):
         response = self.session.post(*args, **kwargs)
